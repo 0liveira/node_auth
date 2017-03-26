@@ -17,4 +17,5 @@ ul.error li{
     color: #a94442;
     background-color: #f2dede;
     border-color: #ebccd1;
+    list-style: none;
 }
