@@ -3,6 +3,8 @@ var router = express.Router();
 const multer = require("multer");
 const upload = multer({ dest: "./uploads" });
 
+const User = require("../models/user")
+
 /* GET users listing. */
 router.get('/', function(req, res, next) {
   res.send('respond with a resource');
@@ -22,13 +24,14 @@ router.post("/register", upload.single("profileImage"), function (req, res, next
   let username = req.body.username
   let password = req.body.password
   let password2 = req.body.password2
+  let profileImage
 
   if (req.file){
     console.log("Uploading file...")
-    let profileImage = req.file.filename
+    profileImage = req.file.filename
   } else {
     console.log("No file uploaded...")
-    let profileImage = "noimage.jpg"
+    profileImage = "noimage.jpg"
   }
 
   // Form validator
@@ -45,7 +48,18 @@ router.post("/register", upload.single("profileImage"), function (req, res, next
   if (errors) {
     res.render("register", { errors })
   } else {
-    console.log("No errors")
+    const newUser = new User({ name, email, username, password, profileImage })
+
+    User.createUser(newUser, (error, user) => {
+      if (error)
+        throw error
+      console.log(user)
+    })
+
+    req.flash("success", "You are now registered and can login")
+
+    res.location("/")
+    res.redirect("/")
   }
 });
 
